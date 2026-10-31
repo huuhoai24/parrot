@@ -1,0 +1,19 @@
+[project]
+name = "youki"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "asgi-autoreload[fastapi]>=0.1.2",
+    "fastapi>=0.143.0",
+    "jinja2>=3.1.6",
+    "uvicorn[standard]>=0.54.0",
+    "webvtt-py>=0.5.1",
+    "yt-dlp[default]>=2026.8.19",
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=7.4.0",
+]

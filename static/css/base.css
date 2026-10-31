@@ -1,0 +1,59 @@
+.player-shell {
+  width: 853px;
+  margin: 40px auto;
+}
+
+.player-shell iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  display: block;
+  border: none;
+}
+
+#controlID {
+  box-sizing: border-box;
+  width: 100%;
+  background: #ececec;
+  border: 1px solid #e3e3e3;
+  border-radius: 0 0 13px 13px;
+  padding: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+}
+.control_buttons {
+  display: flex;
+  align-items: center;
+}
+.control_buttons img {
+  width: 35px;
+  height: 35px;
+  display: block;
+  cursor: pointer;
+}
+.control_buttons > div {
+  margin: 0 5px;
+}
+.caption {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 150px;
+  overflow-y: auto;
+
+  background: #fff;
+  border: 1px solid #e3e3e3;
+  width: 100%;
+  margin: 20px auto 0;
+}
+
+#r_caption {
+  font-family: Georgia, serif;
+  font-size: 40px;
+  line-height: 1.43;
+  text-align: center;
+  color: #004373;
+  margin: 0;
+}

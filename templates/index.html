@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>{{ title }}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/static/css/base.css">
+</head>
+<body>
+    {% if results %}
+        <script>
+          const playlist = {{ results | tojson }};
+          const transcripts = {{ transcripts | tojson }};
+        </script>
+    {% else %}
+        <script> console.log("Not Found Result!") </script>
+    {% endif%}
+
+    <h1>{{ title }}</h1>
+  <div class="player-shell">
+      <form action="/" method="get" class="player-shell">
+        <div class="input-group input-group-lg">
+          <input class="form-control" name="q" value="{{ q }}" type="text" placeholder="Search for..." autocomplete="off">
+          <span class="input-group-btn">
+            <button type="submit" class="btn btn-lg" style="color:#fff;background:#C11615">
+              <span class="glyphicon glyphicon-search"></span> Say it!
+            </button>
+          </span>
+        </div>
+      </form>
+
+      {% if q %}
+      <h2 id="pronounceHeader">
+        How to pronounce <span id="hWord" style="color:#C11615"> {{ q }} </span> in English
+        (<span id="hIndex">1</span> out of {{ total }})
+      </h2>
+      {% endif %}
+
+      <div id="ytplayer"></div>
+      <div id="controlID">
+        <div class="control_buttons">
+          <div><img id="imgPrev" src="/static/img/previous_vs2.png" alt="Previous"></div>
+          <div><img id="imgBack5" src="/static/img/back_5.png" alt="Previous5s"></div>
+          <div><img id="imgRe" src="/static/img/replay.png" alt="Replay"></div>
+          <div><img id="imgPlay" src="/static/img/play.png" alt="Play/Pause"></div>
+          <div><img id="imgNext" src="/static/img/next_vs2.png" alt="Next"></div>
+        </div>
+        <div>Speed: Normal</div>
+      </div>
+      <div class="caption"> <div id="r_caption"></div></div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
+</body>
+</html>
