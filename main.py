@@ -1,5 +1,5 @@
-from youki.database import SubtitleStore
-from youki.sub_download import *
+from parrot.database import SubtitleStore
+from parrot.sub_download import *
 
 with open("dataset/url_video.jsonl", "r", encoding="utf-8") as f:
     video_ids = [json.loads(line) for line in f if line.strip()]

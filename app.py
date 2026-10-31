@@ -4,8 +4,8 @@ from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from youki.database import SubtitleStore
-from youki.sub_download import *
+from parrot.database import SubtitleStore
+from parrot.sub_download import *
 
 BASE_DIR = Path(__file__).resolve().parent
 templates = Jinja2Templates(BASE_DIR / "templates")
@@ -34,7 +34,7 @@ def home(request: Request, q: str = ""):
         request,
         "index.html",
         {
-            "title": "Youki",
+            "title": "parrot",
             "q": q,
             "results": results,
             "transcripts": transcripts,
