@@ -1,3 +1,53 @@
+/* ============================================================
+   Quy ước selector thống nhất:
+   - class (.) = để CSS trang trí, dùng lại được
+   - id (#)    = chỉ để JS bám vào (getElementById), KHÔNG dùng trong CSS
+   Tên: kebab-case
+   JS hooks: #search-form #yt-player #btn-prev #btn-back-5 #btn-replay
+             #btn-play #btn-next #current-word #current-index
+             #total-count #caption-text #btn-save
+   ============================================================ */
+
+/* ---------- Navbar (partial templates/_navbar.html, dùng chung index + study) ---------- */
+nav.ankiweb {
+  background: #eee;
+  padding: 8px 0;
+  margin-bottom: 16px;            /* mb-4 */
+  position: sticky; top: 0; z-index: 50;
+  height: 58.6px; box-sizing: border-box;
+}
+.ankiweb .container {             /* Bootstrap .container */
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 12px;                /* px-3 */
+  display: flex; align-items: center;
+}
+.ankiweb .navbar-brand {          /* chữ 20px, cách phải 16px */
+  display: flex; align-items: center;
+  height: 42.64px; padding: 5px 0;
+  font-size: 20px; line-height: 30px;
+  color: #000;
+  margin-right: 16px;
+}
+.ankiweb .navbar-brand img {
+  width: 32px; height: 32px; margin-left: 4px; vertical-align: middle;
+}
+.ankiweb .nav-right {
+  display: flex; justify-content: space-between; flex: 1;
+}
+.ankiweb ul.link-list {
+  list-style: none; margin: 0; padding: 0; display: flex; align-items: center;
+}
+.ankiweb .nav-link {              /* Bootstrap navbar-light */
+  padding: 8px;
+  font-size: 16px; line-height: 24px;
+  color: rgba(0, 0, 0, .467);
+  text-decoration: none;
+}
+.ankiweb .nav-link:hover { color: rgba(0, 0, 0, .7); }
+.ankiweb .nav-link.active { color: rgba(0, 0, 0, .7); }  /* trang đang mở */
+
+/* ---------- Khung player ---------- */
 .player-shell {
   width: 853px;
   margin: 40px auto;
@@ -10,7 +60,19 @@
   border: none;
 }
 
-#controlID {
+/* ---------- Search ---------- */
+.btn-search {
+  color: #fff;
+  background: #C11615;
+}
+
+/* ---------- Header "How to pronounce" ---------- */
+.current-word {
+  color: #C11615;
+}
+
+/* ---------- Thanh điều khiển ---------- */
+.control-bar {
   box-sizing: border-box;
   width: 100%;
   background: #ececec;
@@ -22,19 +84,44 @@
   justify-content: space-between;
   user-select: none;
 }
-.control_buttons {
+
+.control-buttons {
   display: flex;
   align-items: center;
 }
-.control_buttons img {
+
+.control-buttons img {
   width: 35px;
   height: 35px;
   display: block;
   cursor: pointer;
 }
-.control_buttons > div {
+
+.control-buttons > div {
   margin: 0 5px;
 }
+
+/* cụm phải control bar: nút Save + tốc độ */
+.control-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-save {
+  height: 28px;
+  padding: 0 10px;
+  font-size: 13px;
+  color: #fff;
+  background: #C11615;
+  border: 1px solid #a01312;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.btn-save:hover { background: #a01312; }
+.btn-save:disabled { opacity: .6; cursor: default; }
+
+/* ---------- Caption ---------- */
 .caption {
   box-sizing: border-box;
   display: flex;
@@ -49,7 +136,7 @@
   margin: 20px auto 0;
 }
 
-#r_caption {
+.caption-text {
   font-family: Georgia, serif;
   font-size: 40px;
   line-height: 1.43;
@@ -57,3 +144,14 @@
   color: #004373;
   margin: 0;
 }
+
+.flash-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 24px;
+  min-height: 300px;
+  text-align: center;
+}
+.flash-card .lead { font-size: 24px; }
+#video-box { margin: 16px 0; }

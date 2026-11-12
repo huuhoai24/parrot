@@ -1,0 +1,17 @@
+<!-- //// NAVBAR dùng chung (index.html + study.html) — CSS: static/css/base.css //// -->
+<nav class="ankiweb">
+  <div class="container">
+    <div class="navbar-brand">
+      <span>Parrot</span></div>
+    <div class="nav-right">
+      <ul class="link-list">
+        <li><a class="nav-link {{ 'active' if request.url.path == '/' }}" href="/">Search</a></li>
+        <li><a class="nav-link {{ 'active' if request.url.path == '/study' }}" href="/study">Study</a></li>
+      </ul>
+      <ul class="link-list">
+        <li><a class="nav-link" href="#">Account</a></li>
+        <li><a class="nav-link" href="#">Log Out</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>

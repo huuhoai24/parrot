@@ -1,86 +1,71 @@
-let yt, ytReady = false, pending = null;
-  window.onYouTubeIframeAPIReady = function () {
-    yt = new YT.Player("ytplayer", {
-      width: "100%", height: "100%",
-      videoId: "",
-      events:{
-        onReady: function(){
-          ytReady = true;
-          if (typeof playlist !== "undefined") play(0);
-        },
-        onStateChange: function (e) {
-          document.getElementById("imgPlay").src =
-            e.data === 1 ? "/static/img/pause.png" : "/static/img/play.png";
-      },
-      },
-    });
-};
+// Trang index: search -> playlist -> phát lần lượt + caption theo transcript.
+// Phát video & nút điều khiển: Player (static/js/player.js)
+// Caption/phụ đề: Transcript (static/js/transcript.js)
+let playlist = [];
+let current = 0;
 
-function loadVideo(videoId, startTime) {
-  if (!ytReady) return;
-  yt.loadVideoById(videoId, startTime);
-}
-
-function restart() {
-  if (!ytReady) return;
-  yt.seekTo(playlist[current].start_time, true);
-  yt.playVideo();
-}
-
-function back5(){
-  if (!ytReady) return;
-  const state = yt.getPlayerState();
-  if (state === -1 || state === 5) {
-      play(current);
-      return;
-    }
-  const now = yt.getCurrentTime();
-  const base = now > 0 ? now : playlist[current].start_time;
-  yt.seekTo(Math.max(0, base - 5), true);
-  yt.playVideo();
-}
-
-function pause() {
-  if (!ytReady) return;
-  const st = yt.getPlayerState()
-  if (st === 1) {
-    yt.pauseVideo();
-  } else {
-    yt.playVideo();
+async function search(q) {
+  playlist = await searchVideos(q);
+  document.getElementById("current-word").textContent = q;
+  document.getElementById("total-count").textContent = playlist.length;
+  if (playlist.length) {
+    document.querySelector(".pronounce-header").hidden = false;
+    play(0);
   }
 }
 
-let current = 0;
-let sub = [];
-const captionEl = document.getElementById("r_caption");
-
-function play(i){
-  if (i<0 || i>=playlist.length) return;
+async function play(i) {
+  if (i < 0 || i >= playlist.length) return;
   current = i;
   const v = playlist[i];
-  sub = transcripts[v.video_id] || []
-  document.getElementById("hIndex").textContent = i + 1;
-  loadVideo(v.video_id, v.start_time)
-}
-
-function showTranscript() {
-  if (!ytReady || sub.length === 0) return;
-  const t = yt.getCurrentTime();
-  for (const c of sub) {
-    if (t >= c.start_time && t < c.end_time) {
-      if (captionEl.textContent !== c.text)
-          captionEl.textContent = c.text;
-      return;
-    }
-  }
+  document.getElementById("current-index").textContent = i + 1;
+  Player.load(v.video_id, v.start_time);
+  Transcript.load(v.video_id);
 }
 
 function next() {play(current+1);}
-function prev() {play(current-1);}
+function prev() { play(current - 1);}
 
-document.getElementById("imgPrev") .addEventListener("click", prev);
-document.getElementById("imgRe")   .addEventListener("click", restart);
-document.getElementById("imgNext") .addEventListener("click", next);
-document.getElementById("imgBack5").addEventListener("click", back5);
-document.getElementById("imgPlay") .addEventListener("click", pause);
-setInterval(showTranscript, 250);
+Player.init({
+  getStart: () => (playlist[current] ? playlist[current].start_time : 0),
+  onPrev: prev,
+  onNext: next,
+  onReady: () => { if (playlist.length) play(current); },
+});
+
+Transcript.init();
+
+document.getElementById("search-form").addEventListener("submit", function (e) {
+  e.preventDefault();
+  const q = document.querySelector("input[name=q]").value;
+  search(q);
+});
+
+// Save: lưu cụm từ đang search thành thẻ học (POST /api/cards)
+// back = cụm từ; front (tình huống) tạm thời null — bổ sung sau.
+// video + mốc start/end = cue phụ đề đang phát (hoặc kết quả search đầu tiên)
+document.getElementById("btn-save").addEventListener("click", async function () {
+  if (!playlist.length) return;
+  const q = document.querySelector("input[name=q]").value.trim();
+  const v = playlist[current];
+  const cue = Transcript.currentCue();
+  const body = {
+    front: null,
+    back: q,
+    video_id: v.video_id,
+    start_time: cue ? Math.floor(cue.start_time) : v.start_time,
+    end_time: cue ? Math.ceil(cue.end_time) : v.start_time + 3,
+  };
+  const res = await fetch("/api/cards", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (res.ok) {
+    const btn = this;
+    const old = btn.textContent;
+    btn.textContent = "Đã lưu ✓";
+    btn.disabled = true; // chống bấm đúp tạo thẻ trùng
+    setTimeout(() => { btn.textContent = old; btn.disabled = false; }, 1500);
+  }
+});

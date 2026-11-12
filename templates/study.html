@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="/static/css/base.css">
+<title>Hướng dẫn - Clone màn study AnkiWeb (study/page.tsx)</title>
+<style>
+
+  /* ---- Token toàn cục (đã chụp từ trang thật) ---- */
+  .ankiweb-font {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto,
+      "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif;
+    color: #212529;                 /* Bootstrap body color */
+  }
+
+  /* ---- Nút lớn .btn.btn-primary.btn-lg (dùng chung) ---- */
+  .btn-lg {
+    height: 48px;                   /* padding 8/16 + chữ 20px/lh30 */
+    padding: 8px 16px;
+    font-size: 20px;
+    line-height: 30px;
+    color: #fff;
+    background: #0d6efd;            /* Bootstrap $primary */
+    border: 1px solid #0d6efd;
+    border-radius: 8px;             /* .btn-lg radius lớn hơn thường 6px */
+    cursor: pointer;
+  }
+  .btn-lg:focus {                   /* ring Bootstrap khi focus */
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, .25);
+  }
+
+  /* nút Sign Up trên trang login = a.btn.btn-primary h38 px-3 */
+  .btn-primary-sm {
+    display: inline-flex; align-items: center;
+    height: 38px; padding: 0 12px;
+    background: #0d6efd; border-radius: 6px;
+    color: #fff; font-size: 16px; line-height: 24px;
+    text-decoration: none;
+  }
+
+  /* ================================================================
+     2) main.container — anki-page-shell.tsx
+     ĐIỂM QUAN TRỌNG: min-height 75vh — chính là lý do footer login
+     nằm đúng y=765.6 trên trang cao 900px.
+     ================================================================ */
+  main.ankiweb {
+    max-width: 1140px;
+    margin: 0 auto 16px;            /* mb-4 */
+    padding: 0 12px;                /* px-3 */
+    min-height: 75vh;
+    box-sizing: border-box;
+  }
+
+  /* ================================================================
+     3) THANH CÔNG CỤ #quiz — study-toolbar.tsx
+     Trái: Edit / Limits / + / −  (nút outline, gap 4px)
+     Phải: đếm thẻ 1 + 0 + 0  (new #00f · learn #900 · review #090)
+     ================================================================ */
+  .quiz-row {
+    display: flex;
+    justify-content: space-between;   /* thẳng đứng: trái ↔ phải  */
+    align-items: flex-start;
+  }
+  .quiz-left { display: flex; gap: 4px; }   /* giữa các nút 4px */
+  .btn-outline {                    /* .btn.btn-outline-primary */
+    display: inline-flex; align-items: center;
+    height: 38px;
+    padding: 0 12px;                /* 6px trên/dưới + 12px ngang */
+    font-size: 16px; line-height: 24px;
+    color: #0d6efd;
+    background: none;
+    border: 1px solid #0d6efd;
+    border-radius: 6px;
+    text-decoration: none;
+  }
+  .counts { font-size: 16px; line-height: 24px; }
+  .counts .c-new   { color: rgb(0, 0, 255); }
+  .counts .c-new.active { text-decoration: underline; }  /* hàng đang học được gạch */
+  .counts .c-learn { color: rgb(153, 0, 0); }
+  .counts .c-review { color: rgb(0, 153, 0); }
+
+  /* khoảng dời `div.pt-1 clear-both` sau hàng float */
+  .pt-1-clear { height: 4px; clear: both; }
+
+  /* ================================================================
+     4) THẺ HỌC #qa_box — sample-card.tsx
+     Khung cá thẻ: trắng, radius 6, padding 32/24/48, display flex CỘT
+     (cột→ con #qa tràn ngang đủ chiều, để nội dung có thể căn giữa 640px).
+     NOTE: khối chữ bên trong KHÔNG phải CSS của AnkiWeb — đó là template
+     note của riêng tài khoản ("Helvetica Neue", ink #111, muted #6b6b6b).
+     ================================================================ */
+  #qa_box {
+    background: #fff;
+    border-radius: 6px;
+    padding: 32px 24px 48px;        /* pt-8 / px-6 / pb-12 */
+    display: flex; flex-direction: column;
+  }
+  #qa {                             /* luôn đẩy xuống 30px so với mép trên card */
+    margin-top: 30px;
+    font-family: "Helvetica Neue", Helvetica, Arial, "Segoe UI",
+      system-ui, -apple-system, sans-serif;
+    color: #111;
+  }
+  .front {                          /* mặt trước: 1 cột, căn đều 2 bên */
+    max-width: 640px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .front .meta {                    /* nhãn nhỏ viết HOA, giãn chữ */
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    line-height: 16.5px;
+    color: #6b6b6b;
+    user-select: none;
+  }
+  .front .prompt {                  /* nội dung câu hỏi 25px, vừa đủ lớn */
+    margin-top: 8px;
+    font-size: 25px;
+    font-weight: 500;
+    line-height: 32.5px;
+    letter-spacing: -.015em;
+    color: #111;
+  }
+  hr#answer {                       /* dashed dòi phân cách mặt trước / mặt sau */
+    max-width: 640px;
+    margin: 32px auto;
+    border: 0; border-top: 1px solid #e6e6e6;
+  }
+  .back {                           /* lưng thẻ: lưới 96px + 24px, căn trái */
+    max-width: 640px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    column-gap: 24px; row-gap: 24px;
+    align-items: start;
+    text-align: left;
+  }
+  .back .meta { padding-top: 4px; font-size: 11px; text-transform: uppercase;
+    letter-spacing: .14em; line-height: 16.5px; color: #6b6b6b; }
+  .back .val { font-size: 16px; line-height: 24.8px; color: #111; }
+  #video-box { margin: 16px 0 0; }
+  /* ---- Video + thanh điều khiển ----
+     .control-bar/.control-buttons dùng lại từ static/css/base.css (nhúng ở <head>).
+     Chỉ riêng kích thước #yt-player nằm ở đây vì base.css chỉ bọc iframe
+     qua .player-shell (riêng của trang index). */
+  #yt-player,
+  #yt-player iframe {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    display: block;
+    border: none;
+  }
+  .a-state button { cursor: pointer; }
+
+  /* khoảng trống 96px để không bị che bởi thanh nút ch = #ansarea-pad */
+  #ansarea-pad { height: 96px; }
+
+  /* ================================================================
+     5) THANH NÚT TRẢ LỜI #ansarea — review-bottom-bar.tsx
+     position: fixed ngang đáy, nền trắng che lắp trùng 96px, z-index 9999.
+     ================================================================ */
+  #ansarea {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    height: 96px;
+    background: #fff;
+    z-index: 9999;
+  }
+
+  /* --- trạng thái CÂU HỎI --- */
+  .q-state { display: flex; justify-content: center; }
+  .q-state .pt-4 { padding-top: 16px; }     /* đẩy nút xuống giữa bà */
+
+  /* --- trạng thái TRẢ LỜI --- */
+  .a-state { display: flex; justify-content: center; }
+  .a-state .grade { text-align: center; }
+  .a-state .interval { font-size: 16px; line-height: 24px; margin-top: 0; }
+  .a-state .btn-lg.m-1 { margin: 4px; }
+
+  /* ================================================================
+     6) LẬT THẺ BẰNG CHECKBOX (không cần JS)
+     Toggle nằm TRƯỚC .app → #flip:checked ~ .app … chọn được phần sau.
+     ================================================================ */
+  #flip:checked ~ .app .q-state { display: none; }
+  #flip:checked ~ .app .a-card { display: block; }
+  #flip:not(:checked) ~ .app .a-state { display: none; }
+  #flip:not(:checked) ~ .app .a-card { display: none; }
+
+  .per-hei { color: #0d6efd; font-weight: bold; }
+</style>
+</head>
+<body class="ankiweb-font">
+
+<!-- //// 6) nút bấm để lật thẻ (ẩn) + vùng nội dung //// -->
+<input type="checkbox" id="flip" hidden>
+
+<div class="app">
+
+  {% include "_navbar.html" %}
+
+  <main class="ankiweb">
+
+    <div class="quiz-row">
+      <div class="quiz-left">
+        <a class="btn-outline" href="#">Edit</a>
+        <a class="btn-outline" href="#">Limits</a>
+        <button class="btn-outline" type="button" title="Bigger text">+</button>
+        <button class="btn-outline" type="button" title="Smaller text">-</button>
+      </div>
+      <div class="counts" id="study-progress"></div>
+    </div>
+    <div class="pt-1-clear"></div>
+
+    <!-- //// 4) THẺ HỌC //// -->
+    <div id="qa_box">
+      <div id="qa">
+
+        <!-- mặt trước: nhãn nhỏ HOA + câu hỏi -->
+        <div class="front">
+          <div class="meta">Tình huống</div>
+          <div class="prompt" id="front-text"></div>
+        </div>
+
+        <!-- xuất hiện sau khi "Show Answer" — hr + lưới lưng thẻ, bọc trong .a-card -->
+        <div class="a-card">
+          <hr id="answer">
+          <div class="back">
+            <div class="meta">Câu trả lời</div><div class="val" id="back-text"></div>
+          </div>
+          <!-- Video Player-->
+            <div id="yt-player"></div>
+            <div class="control-bar">
+              <div class="control-buttons">
+                <div><img id="btn-prev" src="/static/img/previous_vs2.png" alt="Previous"></div>
+                <div><img id="btn-back-5" src="/static/img/back_5.png" alt="Previous5s"></div>
+                <div><img id="btn-replay" src="/static/img/replay.png" alt="Replay"></div>
+                <div><img id="btn-play" src="/static/img/play.png" alt="Play/Pause"></div>
+                <div><img id="btn-next" src="/static/img/next_vs2.png" alt="Next"></div>
+              </div>
+              <div class="control-speed">Speed: Normal</div>
+            </div>
+            <!-- caption theo video đang phát (CSS .caption từ base.css) -->
+            <div class="caption"><div id="caption-text" class="caption-text"></div></div>
+          </div>
+        </div>
+        <!-- <br> bây giờ là chó #qa trên trang thật (theo thứ tự DOM) -->
+        <br>
+      </div>
+
+    <!-- khoảng trống để không bị thanh cầm dưới che lên -->
+    <div id="ansarea-pad"></div>
+  </main>
+
+  <!-- //// 5) THANH NÚT TRẢ LỜI (fixed đáy) //// -->
+  <div id="ansarea">
+
+    <!-- trạng thái câu hỏi: label bấm được (checkbox), thực chất là nút Show Answer -->
+    <div class="q-state">
+      <div class="pt-4">
+        <label class="btn-lg" id="btn-show" for="flip" style="cursor:pointer;">Show Answer</label>
+      </div>
+    </div>
+
+    <!-- trạng thái trả lời: 4 nút đánh điểm + khoảng cách kế tiếp lan trên mỗi nút -->
+    <div class="a-state">
+      <div class="grade"><div class="interval">10m</div><button class="btn-lg m-1" data-rating="again">Again</button></div>
+      <div class="grade"><div class="interval">15m</div><button class="btn-lg m-1" data-rating="hard">Hard</button></div>
+      <div class="grade"><div class="interval">2d</div><button class="btn-lg m-1" data-rating="good">Good</button></div>
+      <div class="grade"><div class="interval">6d</div><button class="btn-lg m-1" data-rating="easy">Easy</button></div>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/player.js" defer></script>
+<script src="/static/js/search.js" defer></script>
+<script src="/static/js/transcript.js" defer></script>
+<script src="/static/js/study.js" defer></script>
+</body>
+</html>

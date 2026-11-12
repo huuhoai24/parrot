@@ -56,4 +56,3 @@ for cue_id, videos in index[query[0]].items():
                     print(
                         f"video_id: {video_list[v_id]}, cue: {cue_id}, posittion: {start}, start_time: {start_time}"
                     )
-# print(result)

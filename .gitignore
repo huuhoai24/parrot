@@ -12,5 +12,8 @@ wheels/
 setup-mentor.sh
 opencode.json
 subtitles.db
+subtitles.db.bak
 notes
 .opencode
+.zed/
+dataset/

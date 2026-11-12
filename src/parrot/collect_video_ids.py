@@ -3,11 +3,11 @@ from pathlib import Path
 
 import yt_dlp
 
-BASE = Path(__file__).resolve().parent.parent
+BASE = Path(__file__).resolve().parents[2]
 DATASET_DIR = BASE / "dataset"
 DATASET_DIR.mkdir(parents=True, exist_ok=True)
 CHANNELS_FILE = DATASET_DIR / "channels.txt"
-URL_FILE = DATASET_DIR / "url_video.jsonl"
+URL_FILE = DATASET_DIR / "video_ids.jsonl"
 
 
 def get_channel_urls(chanel_url: str):
